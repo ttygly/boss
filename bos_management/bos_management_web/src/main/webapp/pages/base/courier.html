@@ -63,6 +63,9 @@
 	function doRestore() {
 		alert("将取派员还原...");
 	}
+	function openSearchWindow() {
+		$("#searchWindow").window("open")
+	}
 	//工具栏
 	var toolbar = [ {
 		id : 'button-add',
@@ -84,6 +87,11 @@
 		text : '还原',
 		iconCls : 'icon-save',
 		handler : doRestore
+	}, {
+		id : 'button-search',
+		text : '搜索',
+		iconCls : 'icon-search',
+		handler : openSearchWindow
 	} ];
 	// 定义列
 	var columns = [ [ {
@@ -205,6 +213,34 @@
 			$("#courierForm").submit()
 		}
 	}
+	$.fn.serializeJson = function() {
+		var serializeObj = {};
+		var array = this.serializeArray();
+		var str = this.serialize();
+		$(array).each(
+				function() {
+					if (serializeObj[this.name]) {
+						if ($.isArray(serializeObj[this.name])) {
+							serializeObj[this.name].push(this.value);
+						} else {
+							serializeObj[this.name] = [
+									serializeObj[this.name], this.value ];
+						}
+					} else {
+						serializeObj[this.name] = this.value;
+					}
+				});
+		return serializeObj;
+	};
+
+	// 执行查询
+	function doSearch() {
+		// 把form表单中input节点的name的值和用户输入的内容,拼接成json字符串
+		var result = $("#searchForm").serializeJson();
+		// 让Datagrid重新发起请求,并把用户输入的查询条件传递给后台
+        $('#grid').datagrid('load',result);
+
+	}
 </script>
 </head>
 
@@ -306,7 +342,7 @@
 						<td><input type="text" name="type" /></td>
 					</tr>
 					<tr>
-						<td colspan="2"><a id="searchBtn" href="#"
+						<td colspan="2"><a id="searchBtn" href="#" onclick="doSearch()"
 							class="easyui-linkbutton" data-options="iconCls:'icon-search'">查询</a>
 						</td>
 					</tr>
