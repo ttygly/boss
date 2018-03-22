@@ -31,6 +31,7 @@ import org.springframework.stereotype.Controller;
 import com.itheima.bos.domain.base.Courier;
 import com.itheima.bos.domain.base.Standard;
 import com.itheima.bos.service.base.CourierService;
+import com.itheima.bos.web.action.ConmonAction;
 import com.opensymphony.xwork2.ActionSupport;
 import com.opensymphony.xwork2.ModelDriven;
 
@@ -47,19 +48,19 @@ import net.sf.json.JsonConfig;
 @Controller
 @Scope("prototype")
 @SuppressWarnings("all")
-public class CourierAction extends ActionSupport implements ModelDriven<Courier> {
-    private Courier model = new Courier();
-	@Override
-	public Courier getModel() {
+public class CourierAction extends ConmonAction<Courier> {
+   
+	public CourierAction() {
 		  
-		return model;
+		super(Courier.class);  
+		
 	}
 	@Autowired
 	private CourierService courierService;
 	@Action(value = "courierAction_save",results = {@Result(name = "success",
 			location = "/pages/base/courier.html",type = "redirect")})
 	public String save(){
-		courierService.save(model);
+		courierService.save(getModel());
 		return SUCCESS;
 	}
 	private int page;
@@ -79,10 +80,10 @@ public class CourierAction extends ActionSupport implements ModelDriven<Courier>
 			@Override
 			public Predicate toPredicate(Root<Courier> root,
 					CriteriaQuery<?> query, CriteriaBuilder cb) {
-				String courierNum = model.getCourierNum();
-				String company = model.getCompany();
-				String type = model.getType();
-				Standard standard = model.getStandard();
+				String courierNum = getModel().getCourierNum();
+				String company = getModel().getCompany();
+				String type = getModel().getType();
+				Standard standard = getModel().getStandard();
 				
 				List<Predicate> list = new ArrayList<>();
 				if (StringUtils.isNotEmpty(courierNum)) {
@@ -163,6 +164,18 @@ public class CourierAction extends ActionSupport implements ModelDriven<Courier>
 		courierService.batchDel(ids);
 		return SUCCESS;
 	}
+
+	@Action("courierAction_listajax")
+    public String listajax() throws IOException {
+        // 查询所有的在职的快递员
+
+        List<Courier> list = courierService.findAvaible();
+
+        JsonConfig jsonConfig = new JsonConfig();
+        jsonConfig.setExcludes(new String[] {"fixedAreas", "takeTime"});
+        list2json(list, jsonConfig);
+        return NONE;
+    }
 
 }
   
