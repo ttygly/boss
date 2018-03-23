@@ -4,11 +4,14 @@ import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+
+import org.springframework.data.jpa.repository.Query;
 
 import com.itheima.crm.domain.Customer;
 
@@ -38,5 +41,24 @@ public interface CustomerService {
     @Path("/assignCustomers2FixedArea")
 	void assignCustomer2FixedArea(@QueryParam("customerIds")Long[] customerIds,@QueryParam("fixedAreaId")String fixedAreaId);
 
+    //注册用户
+    @POST
+    @Path("/save")
+    void save(Customer customer);
+    
+    //激活
+    @PUT
+    @Path("/active")
+    void active(@QueryParam("telephone")String telephone);
+    
+    //检查用户是否激活
+    @GET
+    @Path("/isActived")
+    Customer isActived(@QueryParam("telephone") String telephone);
+    
+ // 登录
+    @GET
+    @Path("/login")
+    Customer login(@QueryParam("telephone") String telephone,@QueryParam("password") String password);
 }
   
